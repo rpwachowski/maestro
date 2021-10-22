@@ -70,8 +70,16 @@ public struct ConductedView<Content: View>: View {
     }
 
     public var body: some View {
-        if #available(iOS 15, *) {
-            TimelineView(.animation(minimumInterval: UIScreen.main.frameLength, paused: false)) { baseContext in
+#if os(macOS) // TODO: remove once macOS 12 is finally released...
+        BackwardsCompatibleTimelineView { date in
+            let context = Context(conductor: conductor, date: date)
+            content(context)
+                .environment(\.animationContext, context)
+                .onAppear { conductor.start(at: date) }
+        }
+#else
+        if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
+            TimelineView(.animation(minimumInterval: FrameLength.standardLength, paused: false)) { baseContext in
                 let context = Context(conductor: conductor, date: baseContext.date)
                 content(context)
                     .environment(\.animationContext, context)
@@ -85,6 +93,7 @@ public struct ConductedView<Content: View>: View {
                     .onAppear { conductor.start(at: date) }
             }
         }
+#endif
     }
 
 }

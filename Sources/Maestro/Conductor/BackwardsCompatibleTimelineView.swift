@@ -4,7 +4,7 @@ struct BackwardsCompatibleTimelineView<Content: View>: View {
 
     class Model: ObservableObject {
 
-        private let timer = Timer.publish(every: UIScreen.main.frameLength, tolerance: nil, on: .main, in: .default).autoconnect()
+        private let timer = Timer.publish(every: FrameLength.standardLength, tolerance: nil, on: .main, in: .default).autoconnect()
 
         @Published private(set) var currentDate = Date()
 

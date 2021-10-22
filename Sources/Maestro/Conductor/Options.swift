@@ -57,7 +57,7 @@ public extension AnimationConductor {
 
         func t(referenceTime: AnimationConductor.PlaybackReferenceTime, currentTime: Date, animationCycle: TimeInterval) -> Double {
             let coalescedTime = referenceTime.t * animationCycle
-            let elapsedTime = currentTime.timeIntervalSince(referenceTime.time.addingTimeInterval(-referenceTime))
+            let elapsedTime = currentTime.timeIntervalSince(referenceTime.time.addingTimeInterval(-coalescedTime))
             let numberOfIterations = (cases.lazy.compactMap { `case` -> Repetition? in
                 if case .repeat(let repetition) = `case` { return repetition }
                 return nil
