@@ -58,6 +58,10 @@ public struct AnimationConductor {
     private var options: Options
     private var referenceTime = PlaybackReferenceTime()
 
+    var beginsPaused: Bool {
+        options.beginsPaused
+    }
+
     public init(_ options: Options = [.sequential], delay: TimeInterval = 0, @AnimationStateBuilder initialState: () -> [AnimationState.Property], @AnimationBuilder animation phases: () -> [AnimationPhase]) {
         self.init(options, delay: delay, initialState: AnimationState(values: initialState), animation: phases)
     }

@@ -6,6 +6,7 @@ public extension AnimationConductor {
     struct Options: ExpressibleByArrayLiteral {
 
         private enum Case: Equatable {
+            case beginsPaused
             case rootAnimation(RootAnimation)
             case autoreverse
             case `repeat`(Repetition)
@@ -15,6 +16,13 @@ public extension AnimationConductor {
         /// an animation cycle to include both forwards- and backwards-interpolation.
         public static var autoreverse: Self {
             self.init(.autoreverse)
+        }
+
+        /// The conductor begins paused.
+        ///
+        /// By default, the conductor will start animating once it appears.
+        public static var beginsPaused: Self {
+            self.init(.beginsPaused)
         }
 
         /// Animations in the root animation builder are performed concurrently.
@@ -39,6 +47,10 @@ public extension AnimationConductor {
         }
 
         private var cases: [Case]
+
+        var beginsPaused: Bool {
+            cases.contains(.beginsPaused)
+        }
 
         public init(arrayLiteral elements: Options...) {
             cases = Array(elements.map(\.cases).joined())

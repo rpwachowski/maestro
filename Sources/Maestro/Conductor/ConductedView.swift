@@ -75,7 +75,9 @@ public struct ConductedView<Content: View>: View {
             let context = Context(conductor: conductor, date: date)
             content(context)
                 .environment(\.animationContext, context)
-                .onAppear { conductor.start(at: date) }
+                .onAppear { didAppear(at: date)
+
+                }
         }
 #else
         if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
@@ -83,17 +85,22 @@ public struct ConductedView<Content: View>: View {
                 let context = Context(conductor: conductor, date: baseContext.date)
                 content(context)
                     .environment(\.animationContext, context)
-                    .onAppear { conductor.start(at: baseContext.date) }
+                    .onAppear { didAppear(at: baseContext.date) }
             }
         } else {
             BackwardsCompatibleTimelineView { date in
                 let context = Context(conductor: conductor, date: date)
                 content(context)
                     .environment(\.animationContext, context)
-                    .onAppear { conductor.start(at: date) }
+                    .onAppear { didAppear(at: date) }
             }
         }
 #endif
+    }
+
+    private func didAppear(at time: Date) {
+        if conductor.beginsPaused { return }
+        conductor.start(at: time)
     }
 
 }
