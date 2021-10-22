@@ -75,9 +75,7 @@ public struct ConductedView<Content: View>: View {
             let context = Context(conductor: conductor, date: date)
             content(context)
                 .environment(\.animationContext, context)
-                .onAppear { didAppear(at: date)
-
-                }
+                .onAppear { didAppear(at: date) }
         }
 #else
         if #available(iOS 15.0, macOS 12.0, watchOS 8.0, *) {
