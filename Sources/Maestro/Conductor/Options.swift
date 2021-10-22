@@ -55,7 +55,9 @@ public extension AnimationConductor {
             }.first ?? RootAnimation.sequential.generator)(phases)
         }
 
-        func t(elapsedTime: TimeInterval, animationCycle: TimeInterval) -> Double {
+        func t(referenceTime: AnimationConductor.PlaybackReferenceTime, currentTime: Date, animationCycle: TimeInterval) -> Double {
+            let coalescedTime = referenceTime.t * animationCycle
+            let elapsedTime = currentTime.timeIntervalSince(referenceTime.time.addingTimeInterval(-referenceTime))
             let numberOfIterations = (cases.lazy.compactMap { `case` -> Repetition? in
                 if case .repeat(let repetition) = `case` { return repetition }
                 return nil

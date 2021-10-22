@@ -26,6 +26,11 @@ public struct AnimationConductor {
 
     }
 
+    struct PlaybackReferenceTime {
+        var time = Date()
+        @Clamped(0, 1) var t: Double = 0
+    }
+
     // This is functionally equivalent to a concurrent collection of jump animations. Conductors use this
     // to blend the initial state into subsequent animations.
     private struct Initialization: AnimationPhase {
@@ -51,7 +56,7 @@ public struct AnimationConductor {
     private var initialState: AnimationState
     private var animation: AnimationPhase
     private var options: Options
-    private var lastUpdated = Date()
+    private var referenceTime = PlaybackReferenceTime()
 
     public init(_ options: Options = [.sequential], delay: TimeInterval = 0, @AnimationStateBuilder initialState: () -> [AnimationState.Property], @AnimationBuilder animation phases: () -> [AnimationPhase]) {
         self.init(options, delay: delay, initialState: AnimationState(values: initialState), animation: phases)
@@ -73,13 +78,25 @@ public struct AnimationConductor {
     ///   - time: the reference time for starting the animation. Defaults to the current time.
     public mutating func start(at time: Date = Date()) {
         if isRunning { return }
-        lastUpdated = time
+        referenceTime = PlaybackReferenceTime(time: time, t: referenceTime.t)
         isRunning = true
+    }
+
+    /// Pauses the animation.
+    ///
+    /// - Parameters:
+    ///   - time: the reference time for starting the animation. Defaults to the current time.
+    public mutating func pause(at time: Date = Date()) {
+        if !isRunning { return }
+        let t = options.t(referenceTime: referenceTime, animationCycle: animation.duration.duration)
+        referenceTime = PlaybackReferenceTime(time: time, t: t)
+        isRunning = false
     }
 
     /// Returns the interpolated value for the supplied `AnimationKey` calculated from the animation's start time and the given time.
     public subscript<Key: AnimationKey>(_ key: Key.Type, at time: Date) -> Key.Value {
-        animation[key, at: options.t(elapsedTime: time.timeIntervalSince(lastUpdated), animationCycle: animation.duration.duration)]?(initialValue: initialState[key]) ?? initialState[key]
+        let t = isRunning ? options.t(referenceTime: referenceTime, currentTime: time, animationCycle: animation.duration.duration) : referenceTime.t
+        return animation[key, at: t]?(initialValue: initialState[key]) ?? initialState[key]
     }
 
 }
