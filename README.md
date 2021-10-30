@@ -85,7 +85,7 @@ projects, but including it in a production project comes with inherent risk.
 
 ### SDK
 
-* Xcode 13
+* Xcode 13.1
 * Swift 5.5
 
 ### Deployment targets

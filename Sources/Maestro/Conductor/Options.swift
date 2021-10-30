@@ -6,6 +6,7 @@ public extension AnimationConductor {
     struct Options: ExpressibleByArrayLiteral {
 
         private enum Case: Equatable {
+            case beginsPaused
             case rootAnimation(RootAnimation)
             case autoreverse
             case `repeat`(Repetition)
@@ -15,6 +16,13 @@ public extension AnimationConductor {
         /// an animation cycle to include both forwards- and backwards-interpolation.
         public static var autoreverse: Self {
             self.init(.autoreverse)
+        }
+
+        /// The conductor begins paused.
+        ///
+        /// By default, the conductor will start animating once it appears.
+        public static var beginsPaused: Self {
+            self.init(.beginsPaused)
         }
 
         /// Animations in the root animation builder are performed concurrently.
@@ -40,6 +48,10 @@ public extension AnimationConductor {
 
         private var cases: [Case]
 
+        var beginsPaused: Bool {
+            cases.contains(.beginsPaused)
+        }
+
         public init(arrayLiteral elements: Options...) {
             cases = Array(elements.map(\.cases).joined())
         }
@@ -55,7 +67,9 @@ public extension AnimationConductor {
             }.first ?? RootAnimation.sequential.generator)(phases)
         }
 
-        func t(elapsedTime: TimeInterval, animationCycle: TimeInterval) -> Double {
+        func t(referenceTime: AnimationConductor.PlaybackReferenceTime, currentTime: Date, animationCycle: TimeInterval) -> Double {
+            let coalescedTime = referenceTime.t * animationCycle
+            let elapsedTime = currentTime.timeIntervalSince(referenceTime.time.addingTimeInterval(-coalescedTime))
             let numberOfIterations = (cases.lazy.compactMap { `case` -> Repetition? in
                 if case .repeat(let repetition) = `case` { return repetition }
                 return nil
