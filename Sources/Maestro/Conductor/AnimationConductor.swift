@@ -89,7 +89,7 @@ public struct AnimationConductor {
     /// Pauses the animation.
     ///
     /// - Parameters:
-    ///   - time: the reference time for starting the animation. Defaults to the current time.
+    ///   - time: the reference time for pausing the animation. Defaults to the current time.
     public mutating func pause(at time: Date = Date()) {
         if !isRunning { return }
         let t = options.t(referenceTime: referenceTime, currentTime: time, animationCycle: animation.duration.duration)
