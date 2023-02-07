@@ -1,5 +1,6 @@
 import Foundation
 
+/// A type-erased ``Interpolator``.
 public struct AnyInterpolator<Value>: Interpolator {
 
     public static func == (lhs: AnyInterpolator, rhs: AnyInterpolator) -> Bool {

@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-/// Establishes a keyframe with which a value can be interpolated.
+/// Establishes a keyframe towards which a value may be interpolated.
 public struct Animate<Key: AnimationKey>: AnimationPhase {
     private typealias Value = Key.Value
 
@@ -23,7 +23,7 @@ public struct Animate<Key: AnimationKey>: AnimationPhase {
         }
     }
 
-    public init<Interpolation: TimingFunction>(to value: Key.Value, using interpolator: Interpolation = TimingFunctions.Linear(), duration: TimeInterval) where Key.Value: VectorArithmetic {
+    public init<Interpolation: TimingFunction>(to value: Key.Value, using interpolator: Interpolation = .linear, duration: TimeInterval) where Key.Value: VectorArithmetic {
         self.value = value
         self.interpolator = interpolator
         self.duration = .timed(duration)

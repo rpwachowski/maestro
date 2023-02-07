@@ -1,5 +1,8 @@
 import Foundation
 
+/// A floating-point value representing the normalized amount by which an ``Interpolator`` blends between initial and target values.
+///
+/// Initialzing a `Blend` normalizes its representation by clamping it to the interval _[0, 1]_.
 public struct Blend: ExpressibleByFloatLiteral, ExpressibleByIntegerLiteral {
 
     public static var zero: Self {
