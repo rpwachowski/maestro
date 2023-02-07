@@ -27,7 +27,12 @@ public struct AnimationConductor {
     }
 
     struct PlaybackReferenceTime {
+        enum Direction: Hashable {
+            case forwards
+            case backwards
+        }
         var time = Date()
+        var direction = Direction.forwards
         @Clamped(0, 1) var t: Double = 0
     }
 
@@ -37,7 +42,7 @@ public struct AnimationConductor {
 
         private var state: AnimationState
 
-        var duration: Duration {
+        var duration: AnimationPhaseDuration {
             .instantaneous
         }
 
@@ -81,8 +86,14 @@ public struct AnimationConductor {
     /// - Parameters:
     ///   - time: the reference time for starting the animation. Defaults to the current time.
     public mutating func start(at time: Date = Date()) {
-        if isRunning { return }
+        if isRunning, referenceTime.direction == .forwards { return }
         referenceTime = PlaybackReferenceTime(time: time, t: referenceTime.t)
+        isRunning = true
+    }
+
+    public mutating func reverse(at time: Date = Date()) {
+        if isRunning, referenceTime.direction == .backwards { return }
+        referenceTime = PlaybackReferenceTime(time: time, direction: .backwards, t: referenceTime.t)
         isRunning = true
     }
 
@@ -99,7 +110,7 @@ public struct AnimationConductor {
 
     /// Returns the interpolated value for the supplied `AnimationKey` calculated from the animation's start time and the given time.
     public subscript<Key: AnimationKey>(_ key: Key.Type, at time: Date) -> Key.Value {
-        let t = isRunning ? options.t(referenceTime: referenceTime, currentTime: time, animationCycle: animation.duration.duration) : referenceTime.t
+        let t = isRunning ? abs((referenceTime.direction == .backwards ? -1 : 0) + options.t(referenceTime: referenceTime, currentTime: time, animationCycle: animation.duration.duration)) : referenceTime.t
         return animation[key, at: t]?(initialValue: initialState[key]) ?? initialState[key]
     }
 
