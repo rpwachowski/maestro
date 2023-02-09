@@ -1,18 +1,33 @@
 import Foundation
 import UIKit
 
+/// An ``Interpolator`` which modifies the rate of change of a value by transforming an input ``Blend``.
+public protocol TimingFunction: Interpolator where Value == Blend {
+
+    func value(at t: Blend) -> Blend
+
+}
+
+extension TimingFunction {
+
+    public func value(at t: Blend, from initialValue: Value, to targetValue: Value) -> Value {
+        value(at: t)
+    }
+
+}
+
 /// A namespace of basic timing functions.
 public enum TimingFunctions {
 
     /// A ``TimingFunction`` which does not modify a value's rate of change.
-    public struct Linear: Interpolator {
+    public struct Linear: TimingFunction {
         public func value(at t: Blend) -> Blend { t }
     }
 
     /// A ``TimingFunction`` which modifies a value's rate of change according to the slope of a cubic Bézier curve.
     ///
     /// - seealso:asdasd https://cubic-bezier.com
-    public struct CubicBezier: Interpolator {
+    public struct CubicBezier: TimingFunction {
 
         private var timingFunction: CAMediaTimingFunction
 

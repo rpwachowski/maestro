@@ -19,16 +19,25 @@ public struct Animate<Key: AnimationKey>: AnimationPhase {
         self.interpolator = interpolator
         self.duration = .timed(duration)
         self.interpolation = { initialValue, blend in
-            interpolator.value(at: blend)
+            interpolator.value(at: blend, from: initialValue, to: value)
         }
     }
 
-    public init<Interpolation: TimingFunction>(to value: Key.Value, using interpolator: Interpolation = .linear, duration: TimeInterval) where Key.Value: VectorArithmetic {
-        self.value = value
+    public init<Interpolation: KeyframedInterpolator>(using interpolator: Interpolation, duration: TimeInterval) where Interpolation.Value == Key.Value {
+        self.value = interpolator.targetValue
         self.interpolator = interpolator
         self.duration = .timed(duration)
         self.interpolation = { initialValue, blend in
-            value.scaled(by: interpolator.value(at: blend).value) + initialValue.scaled(by: interpolator.value(at: 1 - blend).value)
+            interpolator.value(at: blend, from: initialValue)
+        }
+    }
+
+    public init<Timing: TimingFunction>(to value: Key.Value, using timingFunction: Timing = .linear, duration: TimeInterval) where Key.Value: VectorArithmetic {
+        self.value = value
+        self.interpolator = timingFunction
+        self.duration = .timed(duration)
+        self.interpolation = { initialValue, blend in
+            value.scaled(by: timingFunction.value(at: blend).value) + initialValue.scaled(by: timingFunction.value(at: 1 - blend).value)
         }
     }
 
