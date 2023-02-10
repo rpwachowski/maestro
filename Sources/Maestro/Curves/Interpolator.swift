@@ -1,29 +1,28 @@
 import Foundation
 
-protocol Interpolator: Hashable {
-    func value(at t: Double) -> Double
+/// A type which interpolates between an initial and target value according to a given ``Blend`` factor.
+public protocol Interpolator<Value> {
+    associatedtype Value
+
+    /// Returns a value interpolated at the argument ``Blend``.
+    func value(at t: Blend, from initialValue: Value, to targetValue: Value) -> Value
+
 }
 
-struct AnyInterpolator: Interpolator {
+/// An ``Interpolator`` which interpolates to its specified ``targetValue``.
+public protocol KeyframedInterpolator<Value>: Interpolator {
+    associatedtype Value
 
-    static func == (lhs: AnyInterpolator, rhs: AnyInterpolator) -> Bool {
-        lhs.base == rhs.base
-    }
+    var targetValue: Value { get }
 
-    private var base: AnyHashable
-    private var interpolate: (Double) -> Double
+    func value(at t: Blend, from initialValue: Value) -> Value
 
-    init<Base: Interpolator>(_ base: Base) {
-        self.base = AnyHashable(base)
-        interpolate = base.value(at:)
-    }
+}
 
-    func hash(into hasher: inout Hasher) {
-        base.hash(into: &hasher)
-    }
+public extension KeyframedInterpolator {
 
-    func value(@Clamped(0, 1) at t: Double) -> Double {
-        interpolate(t)
+    func value(at t: Blend, from initialValue: Value, to targetValue: Value) -> Value {
+        value(at: t, from: initialValue)
     }
 
 }
