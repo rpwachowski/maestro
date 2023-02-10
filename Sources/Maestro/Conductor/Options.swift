@@ -75,11 +75,13 @@ public extension AnimationConductor {
                 return nil
             }.first ?? 1)
             let autoreverses = self.cases.contains(.autoreverse)
-            guard Int(floor(elapsedTime / (animationCycle * (autoreverses ? 2 : 1)))) < numberOfIterations else { return 1 }
+            guard Int(floor(elapsedTime / (animationCycle * (autoreverses ? 2 : 1)))) < numberOfIterations else {
+                return referenceTime.direction.applyOffset(1)
+            }
             if autoreverses && !Int(floor(elapsedTime / animationCycle)).isMultiple(of: 2) {
-                return 1 - elapsedTime.truncatingRemainder(dividingBy: animationCycle) / animationCycle
+                return referenceTime.direction.applyOffset(1 - elapsedTime.truncatingRemainder(dividingBy: animationCycle) / animationCycle)
             } else {
-                return elapsedTime.truncatingRemainder(dividingBy: animationCycle) / animationCycle
+                return referenceTime.direction.applyOffset(elapsedTime.truncatingRemainder(dividingBy: animationCycle) / animationCycle)
             }
         }
 

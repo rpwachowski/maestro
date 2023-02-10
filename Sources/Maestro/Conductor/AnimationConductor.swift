@@ -27,13 +27,22 @@ public struct AnimationConductor {
     }
 
     struct PlaybackReferenceTime {
+
         enum Direction: Hashable {
+
             case forwards
             case backwards
+
+            func applyOffset(_ offset: Double) -> Double {
+                abs((self == .backwards ? -1 : 0) + offset)
+            }
+
         }
+
         var time = Date()
         var direction = Direction.forwards
         @Clamped(0, 1) var t: Double = 0
+
     }
 
     // This is functionally equivalent to a concurrent collection of jump animations. Conductors use this
@@ -104,13 +113,13 @@ public struct AnimationConductor {
     public mutating func pause(at time: Date = Date()) {
         if !isRunning { return }
         let t = options.t(referenceTime: referenceTime, currentTime: time, animationCycle: animation.duration.duration)
-        referenceTime = PlaybackReferenceTime(time: time, t: t)
+        referenceTime = PlaybackReferenceTime(time: time, direction: referenceTime.direction, t: t)
         isRunning = false
     }
 
     /// Returns the interpolated value for the supplied `AnimationKey` calculated from the animation's start time and the given time.
     public subscript<Key: AnimationKey>(_ key: Key.Type, at time: Date) -> Key.Value {
-        let t = isRunning ? abs((referenceTime.direction == .backwards ? -1 : 0) + options.t(referenceTime: referenceTime, currentTime: time, animationCycle: animation.duration.duration)) : referenceTime.t
+        let t = isRunning ? options.t(referenceTime: referenceTime, currentTime: time, animationCycle: animation.duration.duration) : referenceTime.t
         return animation[key, at: t]?(initialValue: initialState[key]) ?? initialState[key]
     }
 
