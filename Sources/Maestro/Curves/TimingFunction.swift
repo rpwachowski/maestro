@@ -1,5 +1,5 @@
 import Foundation
-import UIKit
+import QuartzCore
 
 /// An ``Interpolator`` which modifies the rate of change of a value by transforming an input ``Blend``.
 public protocol TimingFunction: Interpolator where Value == Blend {
@@ -26,7 +26,7 @@ public enum TimingFunctions {
 
     /// A ``TimingFunction`` which modifies a value's rate of change according to the slope of a cubic Bézier curve.
     ///
-    /// - seealso:asdasd https://cubic-bezier.com
+    /// > Tip: Use  [](https://cubic-bezier.com) to experiment with custom curves.
     public struct CubicBezier: TimingFunction {
 
         private var timingFunction: CAMediaTimingFunction
