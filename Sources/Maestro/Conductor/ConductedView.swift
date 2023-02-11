@@ -3,9 +3,9 @@ import SwiftUI
 /// A view whose animated content is coordinated by a supplied `AnimationConductor`.
 ///
 /// To animate the content of a view, wrap the view in a `ConductedView` and supply an ``AnimationConductor`` stored
-/// in a ``State`` property:
+/// in a `@State` property:
 ///
-/// ```
+/// ```swift
 /// struct RubberBandActivityIndicator: View {
 ///
 ///     private struct Line: Shape {
