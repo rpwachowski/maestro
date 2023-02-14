@@ -24,7 +24,7 @@ public struct Jump<Key: AnimationKey>: AnimationPhase {
 
     public subscript<Key: AnimationKey>(key: Key.Type, at t: Double) -> TransitionFunction<Key.Value>? {
         guard keyType == key, let value = self.value as? Key.Value else { return nil }
-        return TransitionFunction { _ in value }
+        return TransitionFunction(isInstantaneous: true) { _ in value }
     }
 
 }

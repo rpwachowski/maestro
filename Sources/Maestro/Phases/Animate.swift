@@ -43,7 +43,7 @@ public struct Animate<Key: AnimationKey>: AnimationPhase {
 
     public subscript<Key: AnimationKey>(key: Key.Type, at t: Double) -> TransitionFunction<Key.Value>? {
         guard key == keyType else { return nil }
-        return TransitionFunction { initialValue in
+        return TransitionFunction(isInstantaneous: duration == .instantaneous) { initialValue in
             (initialValue as? Value).map { interpolation($0, Blend(t)) } as? Key.Value ?? initialValue
         }
     }
