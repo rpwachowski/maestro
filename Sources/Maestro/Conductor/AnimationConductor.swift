@@ -60,7 +60,7 @@ public struct AnimationConductor {
         }
 
         subscript<Key: AnimationKey>(key: Key.Type, at t: Double) -> TransitionFunction<Key.Value>? {
-            TransitionFunction { _ in state[key] }
+            TransitionFunction(isInstantaneous: true) { _ in state[key] }
         }
 
     }
@@ -120,7 +120,9 @@ public struct AnimationConductor {
     /// Returns the interpolated value for the supplied `AnimationKey` calculated from the animation's start time and the given time.
     public subscript<Key: AnimationKey>(_ key: Key.Type, at time: Date) -> Key.Value {
         let t = isRunning ? options.t(referenceTime: referenceTime, currentTime: time, animationCycle: animation.duration.duration) : referenceTime.t
-        return animation[key, at: t]?(initialValue: initialState[key]) ?? initialState[key]
+        // TODO: upgrade AnimationPhase to receive (t, direction). The second condition handles reversing Jump phases.
+        guard let transition = animation[key, at: t], !(transition.isInstantaneous && referenceTime.direction == .backwards) else { return initialState[key] }
+        return transition(initialValue: initialState[key])
     }
 
 }

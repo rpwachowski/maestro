@@ -17,10 +17,13 @@ public protocol AnimationPhase {
 public struct TransitionFunction<Value> {
 
     static func + (lhs: Self, rhs: Self) -> Self {
-        TransitionFunction { initialValue in
+        TransitionFunction(isInstantaneous: lhs.isInstantaneous && rhs.isInstantaneous) { initialValue in
             rhs(initialValue: lhs(initialValue: initialValue))
         }
     }
+
+    // TODO: upgrade AnimationPhase to receive (t, direction)
+    var isInstantaneous: Bool
 
     var function: (Value) -> Value
 
